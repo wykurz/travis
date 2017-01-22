@@ -24,6 +24,7 @@ before_install:
 
 before_script:
   - ulimit -c unlimited -S # enable core dumps
+  - sudo bash -c "echo 'core.%p.%E' > /proc/sys/kernel/core_pattern"
 
 script:
   - mkdir build
@@ -37,7 +38,7 @@ after_failure:
   - ls
   - ls build/
   - ls build/core
-  - COREFILE=$(find build/core -maxdepth 1 -name "core.*" | head -n 1) # find core file
+  - COREFILE=$(find build/ -maxdepth 1 -name "core.*" | head -n 1) # find core file
   - echo ${COREFILE}
   - if [[ -f "${COREFILE}" ]]; then gdb -c "${COREFILE}" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
