@@ -1,0 +1,44 @@
+language: cpp
+sudo: required
+dist: trusty
+
+# NOTE: The COMPILER variable is unused. It simply makes the display on
+# travis-ci.org more readable.
+matrix:
+    include:
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.8
+          sources:
+            - ubuntu-toolchain-r-test
+      env:
+        - C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8
+        - BUILD_TYPE=debug
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y gdb
+
+before_script:
+  - ulimit -c unlimited -S # enable core dumps
+
+script:
+  - mkdir build
+  - cd build
+  - CC=${C_COMPILER} CXX=${CXX_COMPILER} cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+  - make -j2 VERBOSE=1
+  - ./travis
+  - cd ..
+
+after_success:
+  - ./upload_coverage.sh
+
+after_failure:
+  - COREFILE=$(find /tmp/coredumps -maxdepth 1 -name "core.*" | head -n 1) # find core file
+  - if [[ -f "${COREFILE}" ]]; then gdb -c "${COREFILE}" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+
+notifications:
+  email: false

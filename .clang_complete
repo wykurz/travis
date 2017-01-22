@@ -1,0 +1,8 @@
+-std=c++14
+-g
+-O3
+-Wall
+-fPIC
+-I/home/mateusz/projects/profiler
+-I/home/mateusz/tools/benchmark/include
+-DDEBUG_LOG
