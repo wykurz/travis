@@ -42,7 +42,7 @@ after_failure:
   - ls build/core
   - COREFILE=$(find build/ -maxdepth 1 -name "core.*")
   - echo ${COREFILE}
-  - for binname in $(echo ${COREFILE}); do gdb -c ${binname} build/$(echo ${binname}|rev|cut -d \! -f 1|rev) -ex "thread apply all bt" -ex "set pagination 0" -batch; done
+  - for binname in $(echo ${COREFILE}); do gdb -c ${binname} $(echo ${binname}|cut -d "." -f 3|tr \! \/) -ex "thread apply all bt" -ex "set pagination 0" -batch; done
 
 notifications:
   email: false
