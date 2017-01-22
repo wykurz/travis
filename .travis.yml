@@ -32,15 +32,17 @@ script:
   - CC=${C_COMPILER} CXX=${CXX_COMPILER} cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
   - make -j2 VERBOSE=1
   - ./travis
+  - ./travis
+  - ./travis
   - cd ..
 
 after_failure:
   - ls
   - ls build/
   - ls build/core
-  - COREFILE=$(find build/ -maxdepth 1 -name "core.*" | head -n 1) # find core file
+  - COREFILE=$(find build/ -maxdepth 1 -name "core.*")
   - echo ${COREFILE}
-  - if [[ -f "${COREFILE}" ]]; then gdb -c "${COREFILE}" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+  - for binname in $(echo ${COREFILE}); do gdb -c ${binname} build/$(echo ${binname}|rev|cut -d \! -f 1|rev) -ex "thread apply all bt" -ex "set pagination 0" -batch; done
 
 notifications:
   email: false
