@@ -34,7 +34,10 @@ script:
   - cd ..
 
 after_failure:
+  - ls
+  - ls build/
   - COREFILE=$(find build -maxdepth 1 -name "core.*" | head -n 1) # find core file
+  - echo ${COREFILE}
   - if [[ -f "${COREFILE}" ]]; then gdb -c "${COREFILE}" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 notifications:
